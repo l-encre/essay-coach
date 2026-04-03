@@ -15,9 +15,10 @@ class Config:
         """Initialize configuration from environment variables"""
         load_dotenv()
 
-        # OpenAI Configuration
+        # OpenAI-Compatible Configuration
         self.openai_api_key = os.getenv("OPENAI_API_KEY")
         self.openai_model = os.getenv("OPENAI_MODEL", "gpt-4")
+        self.openai_base_url = os.getenv("OPENAI_BASE_URL", "").strip() or None
 
         # CrewAI Configuration
         self.crewai_debug = os.getenv("CREWAI_DEBUG", "False").lower() == "true"
