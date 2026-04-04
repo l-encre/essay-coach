@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from typing import Dict, List, Optional
 
-from essay_coach.agent import EssayCoachAgent, VALID_TRAINING_TYPES
+from essay_coach.agent import EssayCoachAgent
 from essay_coach.config import Config
 
 
@@ -19,39 +19,17 @@ class EssayCoach:
 		self.config = config or Config()
 		self.agent = EssayCoachAgent(self.config)
 
-	def train(
+	def chat(
 		self,
-		training_type: str,
 		user_message: str,
 		conversation_history: Optional[List[Dict[str, str]]] = None,
 	) -> Dict[str, object]:
 		"""
-		Unified entry point for all training types.
+		Unified auto-training chat entry.
 
-		Args:
-			training_type: One of "opening", "closing", "language",
-			               "transitions", "evidence", "argumentation".
-			user_message: Latest user input.
-			conversation_history: Existing dialogue history (pass the value
-			                      returned from the previous call to continue
-			                      a session).
-
-		Returns:
-			{
-				"assistant_reply": str,
-				"conversation_history": list
-			}
+		LLM decides the most suitable training focus each round.
 		"""
-		return self.agent.training_chat(
-			training_type=training_type,
+		return self.agent.chat(
 			user_message=user_message,
 			conversation_history=conversation_history,
 		)
-
-	def opening_training(
-		self,
-		user_message: str,
-		conversation_history: Optional[List[Dict[str, str]]] = None,
-	) -> Dict[str, object]:
-		"""Backward-compatible wrapper — prefer train(type='opening', ...)."""
-		return self.train("opening", user_message, conversation_history)

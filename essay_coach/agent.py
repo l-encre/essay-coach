@@ -10,10 +10,10 @@ from typing import Any, Dict, List, Optional
 from openai import OpenAI
 
 from essay_coach.config import Config
-from essay_coach.prompts.templates import OPENING_TRAINING_SYSTEM_PROMPT, TRAINING_PROMPTS
+from essay_coach.prompts.templates import (
+	AUTO_TRAINING_SYSTEM_PROMPT,
+)
 from essay_coach.tools import ModelEssayTool
-
-VALID_TRAINING_TYPES = tuple(TRAINING_PROMPTS.keys())
 
 
 class EssayCoachAgent:
@@ -163,41 +163,16 @@ class EssayCoachAgent:
 			"conversation_history": new_history,
 		}
 
-	def training_chat(
-		self,
-		training_type: str,
-		user_message: str,
-		conversation_history: Optional[List[Dict[str, str]]] = None,
-	) -> Dict[str, Any]:
-		"""
-		Unified entry point for all training types (Route B).
-
-		Args:
-			training_type: One of "opening", "closing", "language",
-			               "transitions", "evidence", "argumentation".
-			user_message: Latest user input.
-			conversation_history: Existing dialogue history.
-
-		Returns:
-			{
-				"assistant_reply": str,
-				"conversation_history": List[Dict[str, str]]
-			}
-		"""
-		if training_type not in TRAINING_PROMPTS:
-			raise ValueError(
-				f"Unknown training_type: '{training_type}'. "
-				f"Valid options: {list(TRAINING_PROMPTS.keys())}"
-			)
-		system_prompt = TRAINING_PROMPTS[training_type]
-		return self._training_chat(system_prompt, user_message, conversation_history)
-
-	def opening_training_chat(
+	def chat(
 		self,
 		user_message: str,
 		conversation_history: Optional[List[Dict[str, str]]] = None,
 	) -> Dict[str, Any]:
-		"""Backward-compatible wrapper for opening training."""
+		"""
+		Unified auto-training chat entry.
+
+		LLM decides the most suitable training focus each round.
+		"""
 		return self._training_chat(
-			OPENING_TRAINING_SYSTEM_PROMPT, user_message, conversation_history
+			AUTO_TRAINING_SYSTEM_PROMPT, user_message, conversation_history
 		)
